@@ -1,4 +1,4 @@
-const { src, dest, watch, parallel } = require("gulp");
+const { src, dest, watch, parallel, series } = require("gulp");
 
 const scss = require("gulp-sass")(require("sass"));
 const concat = require("gulp-concat");
@@ -6,9 +6,10 @@ const uglify = require("gulp-uglify-es").default;
 
 const browserSync = require("browser-sync").create();
 const autoprefixer = require("gulp-autoprefixer");
+const clean = require("gulp-clean");
 
 function styles() {
-  return src("app/scss/style.scss")
+    return src("app/scss/style.scss")
     .pipe(autoprefixer({ overrideBrowserlist: ["last 10 version"] }))
     .pipe(concat("style.min.scss"))
     .pipe(scss({ outputStyle: "compressed" }))
@@ -17,7 +18,8 @@ function styles() {
 }
 
 function scripts() {
-  return src(["node_modules/swiper/swiper-bundle.js", "app/js/main.js"])
+    // return src(["node_modules/swiper/swiper-bundle.js", "app/js/main.js"]);
+  return src("app/js/main.js")
     .pipe(concat("main.min.js"))
     .pipe(uglify())
     .pipe(dest("app/js"))
@@ -29,22 +31,28 @@ function watching() {
   watch(["app/js/main.js"], scripts);
   watch(["app/*.html"]).on("change", browserSync.reload);
 }
+
 function browsersync() {
   browserSync.init({
     baseDir: "app/",
   });
 }
 
-function build() {
+function cleanDist() {
+  return src("dist").pipe(clean());
+}
+
+function building() {
   return src(["app/css/style.min.css", "app/js/main.min.js", "app/**/*.html"], {
     base: "app",
-  }).pipe(dest('dist'))
+  }).pipe(dest("dist"));
 }
 
 exports.styles = styles;
 exports.scripts = scripts;
 exports.watching = watching;
 exports.browsersync = browsersync;
-exports.build = build;
+
+exports.build = series(cleanDist, building);
 
 exports.default = parallel(styles, scripts, browsersync, watching);
