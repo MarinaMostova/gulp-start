@@ -9,7 +9,7 @@ const autoprefixer = require("gulp-autoprefixer");
 const clean = require("gulp-clean");
 
 function styles() {
-    return src("app/scss/style.scss")
+  return src("app/scss/style.scss")
     .pipe(autoprefixer({ overrideBrowserlist: ["last 10 version"] }))
     .pipe(concat("style.min.scss"))
     .pipe(scss({ outputStyle: "compressed" }))
@@ -18,7 +18,7 @@ function styles() {
 }
 
 function scripts() {
-    // return src(["node_modules/swiper/swiper-bundle.js", "app/js/main.js"]);
+  // return src(["node_modules/swiper/swiper-bundle.js", "app/js/main.js"]);
   return src("app/js/main.js")
     .pipe(concat("main.min.js"))
     .pipe(uglify())
